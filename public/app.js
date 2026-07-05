@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://quick-baths-read.loca.lt';
+const BACKEND_URL = ' https://rotten-kings-judge.loca.lt';
 const audioPlayer = document.getElementById('audio-player');
 const walletBalanceEl = document.getElementById('wallet-balance');
 const walletBalanceContainer = document.getElementById('wallet-balance-container');
