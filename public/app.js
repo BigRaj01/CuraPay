@@ -1,4 +1,6 @@
-const BACKEND_URL = ' https://rotten-kings-judge.loca.lt';
+// ⚠️ IMPORTANT: If you ever restart your localtunnel command, update this URL to the new one!
+const BACKEND_URL = 'https://rotten-kings-judge.loca.lt';
+
 const audioPlayer = document.getElementById('audio-player');
 const walletBalanceEl = document.getElementById('wallet-balance');
 const walletBalanceContainer = document.getElementById('wallet-balance-container');
@@ -58,10 +60,12 @@ function renderBalanceDisplay() {
     }
 }
 
-// Sync values from local node instance state
+// Sync values from local node instance state (WITH LOCALTUNNEL BYPASS HEADER)
 async function syncSystemMetrics() {
     try {
-        const res = await fetch(`${BACKEND_URL}/api/agent-status`);
+        const res = await fetch(`${BACKEND_URL}/api/agent-status`, {
+            headers: { 'Bypass-Tunnel-Reminder': 'true' }
+        });
         const data = await res.json();
         
         currentBalanceValue = data.usdcBalance;
@@ -118,7 +122,7 @@ function renderMusicMarketplace() {
     });
 }
 
-// Process track state playback routing mutations
+// Process track state playback routing mutations (WITH LOCALTUNNEL BYPASS HEADER)
 async function toggleAudioStream(track) {
     if (activeTrack && activeTrack.id === track.id && !audioPlayer.paused) {
         audioPlayer.pause();
@@ -146,7 +150,10 @@ async function toggleAudioStream(track) {
     try {
         const response = await fetch(`${BACKEND_URL}/api/trigger-stream-payment`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Bypass-Tunnel-Reminder': 'true'
+            },
             body: JSON.stringify({ trackId: track.id })
         });
         const result = await response.json();
@@ -173,6 +180,7 @@ function fastForwardPlayback() { if (audioPlayer.src) { audioPlayer.currentTime 
 
 // Format time string utilities
 function formatTime(secs) {
+    if (isNaN(secs)) return "0:00";
     const mins = Math.floor(secs / 60);
     const remainSecs = Math.floor(secs % 60);
     return `${mins}:${remainSecs < 10 ? '0' : ''}${remainSecs}`;
