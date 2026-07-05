@@ -1,5 +1,4 @@
-// ⚠️ IMPORTANT: If you ever restart your localtunnel command, update this URL to the new one!
-const BACKEND_URL = 'https://rotten-kings-judge.loca.lt';
+const BACKEND_URL = ' https://tasty-snakes-open.loca.lt';
 
 const audioPlayer = document.getElementById('audio-player');
 const walletBalanceEl = document.getElementById('wallet-balance');
@@ -60,12 +59,10 @@ function renderBalanceDisplay() {
     }
 }
 
-// Sync values from local node instance state (WITH LOCALTUNNEL BYPASS HEADER)
+// Sync values from local node instance state
 async function syncSystemMetrics() {
     try {
-        const res = await fetch(`${BACKEND_URL}/api/agent-status`, {
-            headers: { 'Bypass-Tunnel-Reminder': 'true' }
-        });
+        const res = await fetch(`${BACKEND_URL}/api/agent-status`);
         const data = await res.json();
         
         currentBalanceValue = data.usdcBalance;
@@ -122,7 +119,7 @@ function renderMusicMarketplace() {
     });
 }
 
-// Process track state playback routing mutations (WITH LOCALTUNNEL BYPASS HEADER)
+// Process track state playback routing mutations
 async function toggleAudioStream(track) {
     if (activeTrack && activeTrack.id === track.id && !audioPlayer.paused) {
         audioPlayer.pause();
@@ -151,8 +148,7 @@ async function toggleAudioStream(track) {
         const response = await fetch(`${BACKEND_URL}/api/trigger-stream-payment`, {
             method: 'POST',
             headers: { 
-                'Content-Type': 'application/json',
-                'Bypass-Tunnel-Reminder': 'true'
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({ trackId: track.id })
         });
@@ -160,7 +156,12 @@ async function toggleAudioStream(track) {
         
         if (result.success) {
             addLog(`✅ Atomic Settlement Succeeded: 0.01 USDC successfully routed to Artist address!`, true);
-            addLog(`🔗 Circle Ledger Tx Record ID: ${result.txId}`, true);
+            // Check if backend returned an actual tx id or fell back to background processing logs
+            if (result.txId) {
+                addLog(`🔗 Circle Ledger Tx Record ID: ${result.txId}`, true);
+            } else {
+                addLog(`ℹ️ Background worker initialized. Monitor server console for ledger registration logs.`);
+            }
             setTimeout(syncSystemMetrics, 1500);
         } else {
             addLog(`❌ Settlement pipeline execution rejection context: ${result.error}`);
